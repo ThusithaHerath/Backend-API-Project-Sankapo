@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\User;
+use App\Mail\VerifyEmail;
+use App\Notifications\Announcement;
+use Mail;
 
 class AuthController extends Controller
 {
@@ -18,19 +21,44 @@ class AuthController extends Controller
 	 * Register new user
 	*/
 	public function signup(Request $request) {
-		$validatedData = $request->validate([
-			'name' => 'required|string|max:255',
-			'email' => 'required|email|unique:users,email',
-			'password' => 'required|min:6|confirmed',
-		]);
+		if (User::where('email', '=', $request->input('email'))->exists()) {
+            return response()->json([
+                'message' => 'Sorry, User with the provided email is already exists!',
+            ], 403);
+        }
+        else{
+            $validated = $request->validate([
+            'password' => 'required|min:8|max:12',
+            'phonenumber'=> 'required|max:10',
+            'fullname'=>'required'
+            ]);
 
-		$validatedData['password'] = Hash::make($validatedData['password']);
-
-		if(User::create($validatedData)) {
-			return response()->json(null, 201);
-		}
-
-		return response()->json(null, 404);
+            if($validated){
+                $user = new User();
+                $user->email = $request->input('email');
+                $user->password = Hash::make($request->input('password'));
+                $user->phonenumber = $request->input('phonenumber');
+                $user->nrc = $request->input('nrc');
+                $user->fullname = $request->input('fullname');
+                $user->province = $request->input('province');
+                $user->city = $request->input('city');
+                $user->town = $request->input('town');
+                $user->dob = $request->input('dob');
+                $data = $user->save();
+        
+		        Mail::to($request->input('email'))->send(new VerifyEmail($data));
+	
+				return response()->json([
+					'message' => 'New user has been addedd successfully!',
+				], 200);		
+            }
+            else{
+                return response()->json([
+                    'message' => 'Error while adding user!',
+                ], 500);
+            }
+       
+        }
 	}
 
 	/*
