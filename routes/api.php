@@ -22,4 +22,7 @@ Route::prefix('auth')->group(function () {
 
 	Route::post('/password/email', 'App\Http\Controllers\Api\Auth\AuthController@sendPasswordResetLinkEmail')->middleware('throttle:5,1')->name('password.email');
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
+
+	/* New Added Routes */
+	Route::get('account/verify/{token}', 'App\Http\Controllers\Api\Auth\AuthController@verifyAccount')->name('auth.login');
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Models\UserVerify;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password;
@@ -14,57 +15,75 @@ use App\Mail\VerifyEmail;
 use App\Notifications\Announcement;
 use Mail;
 
+use function Psy\info;
+
 class AuthController extends Controller
 {
 
 	/*
 	 * Register new user
 	*/
-	public function signup(Request $request) {
+	public function signup(Request $request)
+	{
 		if (User::where('email', '=', $request->input('email'))->exists()) {
-            return response()->json([
-                'message' => 'Sorry, User with the provided email is already exists!',
-            ], 403);
-        }
-        else{
-            $validated = $request->validate([
-            'password' => 'required|min:8|max:12',
-            'phonenumber'=> 'required|max:10',
-            'fullname'=>'required'
-            ]);
+			return response()->json([
+				'message' => 'Sorry, User with the provided email is already exists!',
+			], 403);
+		} else {
+			$validated = $request->validate([
+				'password' => 'required|min:8|max:12',
+				'phonenumber' => 'required|max:10',
+				'fullname' => 'required'
+			]);
 
-            if($validated){
-                $user = new User();
-                $user->email = $request->input('email');
-                $user->password = Hash::make($request->input('password'));
-                $user->phonenumber = $request->input('phonenumber');
-                $user->nrc = $request->input('nrc');
-                $user->fullname = $request->input('fullname');
-                $user->province = $request->input('province');
-                $user->city = $request->input('city');
-                $user->town = $request->input('town');
-                $user->dob = $request->input('dob');
-                $data = $user->save();
-        
-		        Mail::to($request->input('email'))->send(new VerifyEmail($data));
-	
+			if ($validated) {
+				$user = new User();
+				$user->email = $request->input('email');
+				$user->password = Hash::make($request->input('password'));
+				$user->phonenumber = $request->input('phonenumber');
+				$user->nrc = $request->input('nrc');
+				$user->fullname = $request->input('fullname');
+				$user->province = $request->input('province');
+				$user->city = $request->input('city');
+				$user->town = $request->input('town');
+				$user->dob = $request->input('dob');
+				$user->save();
+
+				// $createUser = $this->create($data);
+				$token = Str::random(64);
+
+				UserVerify::create([
+					'user_id' => $user->id,
+					'token' => $token
+				]);
+
+				$userData = array('token' => $token, 'userData' => $user);
+				// $userData = array();
+				// array_push($userData, $token, $user);
+				// Mail::send('notifications.verifyEmail', ['data' => $userData], function ($message) use ($request) {
+				// 	$message->to($request->input('email'));
+				// 	$message->subject('Email Verification Mail');
+				// });
+				Mail::to($request->input('email'))->send(new VerifyEmail($userData));
+
+
 				return response()->json([
 					'message' => 'New user has been addedd successfully!',
-				], 200);		
-            }
-            else{
-                return response()->json([
-                    'message' => 'Error while adding user!',
-                ], 500);
-            }
-       
-        }
+					'data' => $userData
+				], 200);
+			} else {
+				return response()->json([
+					'message' => 'Error while adding user!',
+				], 500);
+			}
+		}
 	}
 
 	/*
 	 * Generate sanctum token on successful login
 	*/
-	public function login(Request $request) {
+	public function login(Request $request)
+	{
 		$request->validate([
 			'email' => 'required|email',
 			'password' => 'required',
@@ -72,7 +91,7 @@ class AuthController extends Controller
 
 		$user = User::where('email', $request->email)->first();
 
-		if (! $user || ! Hash::check($request->password, $user->password)) {
+		if (!$user || !Hash::check($request->password, $user->password)) {
 			throw ValidationException::withMessages([
 				'email' => ['The provided credentials are incorrect.'],
 			]);
@@ -88,7 +107,8 @@ class AuthController extends Controller
 	/*
 	 * Revoke token; only remove token that is used to perform logout (i.e. will not revoke all tokens)
 	*/
-	public function logout(Request $request) {
+	public function logout(Request $request)
+	{
 
 		// Revoke the token that was used to authenticate the current request
 		$request->user()->currentAccessToken()->delete();
@@ -100,19 +120,21 @@ class AuthController extends Controller
 	/*
 	 * Get authenticated user details
 	*/
-	public function getAuthenticatedUser(Request $request) {
+	public function getAuthenticatedUser(Request $request)
+	{
 		return $request->user();
 	}
 
 
-	public function sendPasswordResetLinkEmail(Request $request) {
+	public function sendPasswordResetLinkEmail(Request $request)
+	{
 		$request->validate(['email' => 'required|email']);
 
 		$status = Password::sendResetLink(
 			$request->only('email')
 		);
 
-		if($status === Password::RESET_LINK_SENT) {
+		if ($status === Password::RESET_LINK_SENT) {
 			return response()->json(['message' => __($status)], 200);
 		} else {
 			throw ValidationException::withMessages([
@@ -121,7 +143,8 @@ class AuthController extends Controller
 		}
 	}
 
-	public function resetPassword(Request $request) {
+	public function resetPassword(Request $request)
+	{
 		$request->validate([
 			'token' => 'required',
 			'email' => 'required|email',
@@ -141,12 +164,35 @@ class AuthController extends Controller
 			}
 		);
 
-		if($status == Password::PASSWORD_RESET) {
+		if ($status == Password::PASSWORD_RESET) {
 			return response()->json(['message' => __($status)], 200);
 		} else {
 			throw ValidationException::withMessages([
 				'email' => __($status)
 			]);
 		}
+	}
+
+
+	public function verifyAccount($token)
+	{
+		$verifyUser = UserVerify::where('token', $token)->first();
+
+		$message = 'Sorry your email cannot be identified.';
+
+		if (!is_null($verifyUser)) {
+			$user = $verifyUser->user;
+
+			if (!$user->is_email_verified) {
+				$verifyUser->user->is_email_verified = 1;
+				$verifyUser->user->save();
+				$message = "Your e-mail is verified. You can now login.";
+			} else {
+				$message = "Your e-mail is already verified. You can now login.";
+			}
+		}
+		return response()->json([
+			'message' => $message,
+		], 200);
 	}
 }

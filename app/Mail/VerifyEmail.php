@@ -28,8 +28,9 @@ class VerifyEmail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('notifications.verifyEmail')
-                    ->subject('New user has been added')
-                    ->from('thusithalherath@gmail.com');
+        $user = $this->data;
+        return $this->markdown('notifications.verifyEmail', ['data' => $user])
+            ->subject('New user has been added')
+            ->from('dilmidilshara19@gmail.com');
     }
 }
