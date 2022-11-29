@@ -23,6 +23,14 @@ Route::prefix('auth')->group(function () {
 	Route::post('/password/email', 'App\Http\Controllers\Api\Auth\AuthController@sendPasswordResetLinkEmail')->middleware('throttle:5,1')->name('password.email');
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
 
-	/* New Added Routes */
+	
 	Route::get('account/verify/{token}', 'App\Http\Controllers\Api\Auth\AuthController@verifyAccount')->name('auth.login');
+});
+
+Route::prefix('category')->group(function () {
+	Route::post('create', 'App\Http\Controllers\CategoriesController@create')->name('category.create');
+	Route::get('list', 'App\Http\Controllers\CategoriesController@show')->name('category.list');
+    Route::get('edit/{id}', 'App\Http\Controllers\CategoriesController@edit')->name('category.edit');
+	Route::put('update/{id}', 'App\Http\Controllers\CategoriesController@update')->name('category.update');
+	Route::delete('delete/{id}', 'App\Http\Controllers\CategoriesController@destroy')->name('category.delete');
 });

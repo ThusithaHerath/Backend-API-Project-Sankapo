@@ -49,21 +49,17 @@ class AuthController extends Controller
 				$user->dob = $request->input('dob');
 				$user->save();
 
-				// $createUser = $this->create($data);
+				//create random string for remember token
 				$token = Str::random(64);
 
+				//insert remember token to userverify table
 				UserVerify::create([
 					'user_id' => $user->id,
 					'token' => $token
 				]);
 
 				$userData = array('token' => $token, 'userData' => $user);
-				// $userData = array();
-				// array_push($userData, $token, $user);
-				// Mail::send('notifications.verifyEmail', ['data' => $userData], function ($message) use ($request) {
-				// 	$message->to($request->input('email'));
-				// 	$message->subject('Email Verification Mail');
-				// });
+				//send verify email to registered user
 				Mail::to($request->input('email'))->send(new VerifyEmail($userData));
 
 
