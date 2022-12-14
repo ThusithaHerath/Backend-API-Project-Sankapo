@@ -38,4 +38,5 @@ Route::prefix('category')->group(function () {
 Route::prefix('add')->group(function () {
 	Route::post('create', 'App\Http\Controllers\Api\AddProductsController@create')->name('add.store');
 	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('add.show');
+	Route::post('approve/{id}', 'App\Http\Controllers\Api\AddProductsController@approve')->name('add.approve');
 });
