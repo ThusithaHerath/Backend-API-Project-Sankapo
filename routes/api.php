@@ -28,9 +28,14 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('category')->group(function () {
-	Route::post('create', 'App\Http\Controllers\CategoriesController@create')->name('category.create');
-	Route::get('list', 'App\Http\Controllers\CategoriesController@show')->name('category.list');
-	Route::get('edit/{id}', 'App\Http\Controllers\CategoriesController@edit')->name('category.edit');
-	Route::put('update/{id}', 'App\Http\Controllers\CategoriesController@update')->name('category.update');
-	Route::delete('delete/{id}', 'App\Http\Controllers\CategoriesController@destroy')->name('category.delete');
+	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.store');
+	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->name('category.list');
+    Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
+	Route::put('update/{id}', 'App\Http\Controllers\Api\CategoriesController@update')->name('category.update');
+	Route::delete('delete/{id}', 'App\Http\Controllers\Api\CategoriesController@destroy')->name('category.delete');
+});
+
+Route::prefix('add')->group(function () {
+	Route::post('create', 'App\Http\Controllers\Api\AddProductsController@create')->name('add.store');
+	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('add.show');
 });
