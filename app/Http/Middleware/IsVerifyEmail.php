@@ -25,6 +25,7 @@ class IsVerifyEmail
         // }
 
         // return $next($request);
+        $token = $request->route()->parameters();
         $verifyUser = UserVerify::where('token', $token)->first();
 
         $message = 'Sorry your email cannot be identified.';

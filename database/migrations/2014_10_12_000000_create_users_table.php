@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('town');
             $table->string('dob');
             $table->string('role')->default('0');
+            $table->rememberToken();
             $table->timestamps();
         });
     }
