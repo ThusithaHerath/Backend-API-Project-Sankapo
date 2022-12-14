@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Route::middleware(['auth'])->group(function () {
+// 	Route::get('/activities', 'ActivitiesController@index');
+// });
+
+
 Route::prefix('auth')->group(function () {
 	Route::post('signup', 'App\Http\Controllers\Api\Auth\AuthController@signup')->name('auth.signup');
 	Route::post('login', 'App\Http\Controllers\Api\Auth\AuthController@login')->name('auth.login');
@@ -24,13 +29,13 @@ Route::prefix('auth')->group(function () {
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
 
 
-	Route::get('account/verify/{token}', 'App\Http\Controllers\Api\Auth\AuthController@verifyAccount')->middleware('is_verify_email')->name('auth.login');
+	Route::get('account/verify/{token}')->middleware('is_verify_email');
 });
 
 Route::prefix('category')->group(function () {
 	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.store');
-	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->name('category.list');
-    Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
+	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->middleware('isAdmin')->name('category.list');
+	Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
 	Route::put('update/{id}', 'App\Http\Controllers\Api\CategoriesController@update')->name('category.update');
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\CategoriesController@destroy')->name('category.delete');
 });
