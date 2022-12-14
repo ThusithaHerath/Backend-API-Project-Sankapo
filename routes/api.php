@@ -23,8 +23,8 @@ Route::prefix('auth')->group(function () {
 	Route::post('/password/email', 'App\Http\Controllers\Api\Auth\AuthController@sendPasswordResetLinkEmail')->middleware('throttle:5,1')->name('password.email');
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
 
-	
-	Route::get('account/verify/{token}', 'App\Http\Controllers\Api\Auth\AuthController@verifyAccount')->name('auth.login');
+
+	Route::get('account/verify/{token}', 'App\Http\Controllers\Api\Auth\AuthController@verifyAccount')->middleware('is_verify_email')->name('auth.login');
 });
 
 Route::prefix('category')->group(function () {

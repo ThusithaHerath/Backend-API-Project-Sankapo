@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\UserVerify;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +18,31 @@ class IsVerifyEmail
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::user()->is_email_verified) {
-            auth()->logout();
-            return redirect()->route('login')
-                ->with('message', 'You need to confirm your account. We have sent you an activation code, please check your email.');
-        }
+        // if (!Auth::user()->is_email_verified) {
+        //     auth()->logout();
+        //     return redirect()->route('login')
+        //         ->with('message', 'You need to confirm your account. We have sent you an activation code, please check your email.');
+        // }
 
-        return $next($request);
+        // return $next($request);
+        $token = $request->route()->parameters();
+        $verifyUser = UserVerify::where('token', $token)->first();
+
+        $message = 'Sorry your email cannot be identified.';
+
+        if (!is_null($verifyUser)) {
+            $user = $verifyUser->user;
+
+            if (!$user->is_email_verified) {
+                $verifyUser->user->is_email_verified = 1;
+                $verifyUser->user->save();
+                $message = "Your e-mail is verified. You can now login.";
+            } else {
+                $message = "Your e-mail is already verified. You can now login.";
+            }
+        }
+        return response()->json([
+            'message' => $message,
+        ], 200);
     }
 }
