@@ -70,7 +70,6 @@ class PropertiesController extends Controller
         }
     }
 
-
     public function showAll()
     {
         $properties = Property::where('isApprove', '1')->get()->all();
@@ -115,7 +114,6 @@ class PropertiesController extends Controller
         }
     }
 
-
     public function search($id)
     {
         if (Property::where('id', $id)->exists()) {
@@ -129,8 +127,6 @@ class PropertiesController extends Controller
             ], 500);
         }
     }
-
-
 
     public function update(Request $request, $id)
     {
@@ -172,8 +168,6 @@ class PropertiesController extends Controller
             ], 500);
         }
     }
-
-
 
     public function destroy($id)
     {
