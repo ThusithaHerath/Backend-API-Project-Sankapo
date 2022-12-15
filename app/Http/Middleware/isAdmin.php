@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -16,11 +17,22 @@ class isAdmin
      */
     public function handle(Request $request, Closure $next)
     {
-        // dd(auth()->user());
+        // dd($request->input('email'));
+        $isAdmin = User::where('email', $request->input('email'))->first();
+        // dd($isAdmin->role);
+        // dd(response()->json($isAdmin));
+        $message = '';
 
-        if (auth()->user()->role == 1) {
-            return $next($request);
+        if (!is_null($isAdmin)) {
+
+            if ($isAdmin->role == 0) {
+                $message = "User";
+            } else {
+                $message = "Admin";
+            }
         }
-        return redirect('home')->with('error', 'You have not admin access');
+        return response()->json([
+            'message' => $message,
+        ], 200);
     }
 }
