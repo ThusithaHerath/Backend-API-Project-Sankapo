@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\AddProducts;
 use File;
 use Image;
+use DB;
 
 class AddProductsController extends Controller
 {
@@ -76,6 +77,20 @@ class AddProductsController extends Controller
         }
     }
 
+    public function approve($id){
+        $isApprove = DB::table('add_products')->where('id',$id)->update(['isApprove'=>'1']);
+        if($isApprove){
+            return response()->json([
+                'message' => 'Your add has been approved',
+            ], 200);
+        }
+        else{
+            return response()->json([
+                'message' => 'Error while approving add!',
+            ], 500);
+        }
+    }
+
     /**
      * Display the specified resource.
      *
@@ -130,4 +145,6 @@ class AddProductsController extends Controller
     {
         //
     }
+
+    
 }

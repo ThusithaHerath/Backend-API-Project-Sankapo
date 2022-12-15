@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware(['auth'])->group(function () {
-// 	Route::get('/activities', 'ActivitiesController@index');
-// });
+
 
 
 Route::prefix('auth')->group(function () {
