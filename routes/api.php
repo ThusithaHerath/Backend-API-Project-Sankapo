@@ -44,3 +44,13 @@ Route::prefix('add')->group(function () {
 	Route::post('create', 'App\Http\Controllers\Api\AddProductsController@create')->name('add.store');
 	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('add.show');
 });
+
+
+Route::prefix('property')->group(function () {
+	Route::post('create', 'App\Http\Controllers\Api\PropertiesController@create')->name('property.store');
+	Route::get('list', 'App\Http\Controllers\Api\PropertiesController@showAll')->name('property.list');
+	Route::get('list/{status}', 'App\Http\Controllers\Api\PropertiesController@showPropertyAds')->name('property.listFilter');
+	Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
+	Route::post('update/{id}', 'App\Http\Controllers\Api\PropertiesController@update')->name('property.update');
+	Route::delete('delete/{id}', 'App\Http\Controllers\Api\PropertiesController@destroy')->name('property.delete');
+});
