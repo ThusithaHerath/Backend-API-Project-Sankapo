@@ -28,6 +28,7 @@ class PropertiesController extends Controller
             'room_arrangement' => 'required',
 
         ]);
+
         if ($validated) {
             $data = new Property;
             $data->tittle = $request->input('tittle');
@@ -45,20 +46,19 @@ class PropertiesController extends Controller
             $data->room_arrangement = $request->input('room_arrangement');
             // $data->isApprove = $request->input('isApprove');
 
+            $lastId = Property::orderBy('id', 'DESC')->pluck('id');
+            $insertId = json_decode($lastId)[0] + 1;
 
-            $image = $request->images;
-            $imagename = time() . '.' . $image->getClientOriginalExtension();
-            $request->images->move('uploads/images', $imagename);
-            $data->images = $imagename;
+            $imageArray = [];
+            foreach ($request->images as $imagefile) {
+                $imagename = $insertId . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
+                $imagefile->move('uploads/images', $imagename);
+                array_push($imageArray, $imagename);
+            }
+
+
+            $data->images = json_encode($imageArray);
             $data->save();
-
-            // foreach ($request->file('images') as $imagefile) {
-            //     $image = new Image;
-            //     $imagename=time().'.'.$imagefile->getClientOriginalExtension();
-            //     $imagefile->move('uploads/images',$imagename);
-            //     $data->image=$imagename;
-            //     $image->save();
-            // }
 
             return response()->json([
                 'message' => 'Congratulations!, your add is up and running',
