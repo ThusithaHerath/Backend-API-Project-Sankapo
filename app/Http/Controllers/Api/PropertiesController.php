@@ -147,20 +147,50 @@ class PropertiesController extends Controller
             $property->electricity = $request->input('electricity');
             $property->restroom = $request->input('restroom');
             $property->room_arrangement = $request->input('room_arrangement');
-            // $property->isApprove = $request->input('isApprove');
 
+            $imageArray = [];
 
-            $image = $request->images;
+            foreach ($request->images as $imagefile) {
+                $newImageName = $property->id . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
 
-            $imagename = time() . '.' . $image->getClientOriginalExtension();
-            $request->images->move('uploads/images', $imagename);
-            $property->images = $imagename;
+                if (file_exists(public_path('uploads/images/' . $imagefile->getClientOriginalName()))) {
+                    unlink(public_path('uploads/images/' . $imagefile->getClientOriginalName()));
+                    $imagefile->move('uploads/images', $newImageName);
+                    array_push($imageArray, $newImageName);
+                } else {
+                    $imagefile->move('uploads/images', $newImageName);
+                    array_push($imageArray, $newImageName);
+                }
+            }
 
+            $property->images = json_encode($imageArray);
             $property->update();
 
             return response()->json([
                 'data' => $property,
                 'message' => 'property updated successfully!',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is no record for this id',
+            ], 500);
+        }
+    }
+
+    public function approveAd(Request $request, $id)
+    {
+        // dd($request);
+        if (Property::where('id', $id)->exists()) {
+            $property  = Property::find($id);
+
+
+            $property->isApprove = '1';
+
+            $property->update();
+
+            return response()->json([
+                'data' => $property,
+                'message' => 'property approved successfully!',
             ], 200);
         } else {
             return response()->json([
