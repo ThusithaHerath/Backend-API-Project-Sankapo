@@ -80,23 +80,29 @@ class AuthController extends Controller
 	*/
 	public function login(Request $request)
 	{
-		$request->validate([
+		$validator = $request->validate([
 			'email' => 'required|email',
 			'password' => 'required',
 		]);
 
 		$user = User::where('email', $request->email)->first();
 
-		if (!$user || !Hash::check($request->password, $user->password)) {
-			throw ValidationException::withMessages([
-				'email' => ['The provided credentials are incorrect.'],
-			]);
+		if($user){
+			if (Hash::check($request->password, $user->password)) {
+				return response()->json([
+					'user' => $user,
+					'message' => 'Successfully logged in!',
+					'access_token' => $user->createToken($request->email)->plainTextToken
+				], 200);
+			}
+		}
+		else{
+			return response()->json([
+				'user' => $user,
+				'message' => 'The provided credentials are incorrect!',
+			], 401);
 		}
 
-		return response()->json([
-			'user' => $user,
-			'access_token' => $user->createToken($request->email)->plainTextToken
-		], 200);
 	}
 
 

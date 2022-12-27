@@ -8,6 +8,8 @@ use App\Models\AddProducts;
 use File;
 use Image;
 use DB;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Auth;
 
 class AddProductsController extends Controller
 {
@@ -45,26 +47,28 @@ class AddProductsController extends Controller
             'condition' => 'required'
         ]);
         if($validated){
-            $data = new AddProducts;
-            $data->title = $request->input('title');
-            $data->category = $request->input('category');
-            $data->description = $request->input('description');
-            $data->condition = $request->input('condition');
-            $data->buy = $request->input('buy');
+                $data = new AddProducts;
+                $data->title = $request->input('title');
+                $data->category = $request->input('category');
+                $data->description = $request->input('description');
+                $data->condition = $request->input('condition');
+                $data->buy = $request->input('buy');   
+                $data->owner = Auth::id();    
 
-            $image=$request->image;
-            $imagename=time().'.'.$image->getClientOriginalExtension();
-            $request->image->move('uploads/images',$imagename);
-            $data->images=$imagename;
-            $data->save();
+                $lastId = AddProducts::orderBy('id', 'DESC')->pluck('id');
+                $insertId = json_decode($lastId)[0] + 1;
+    
+                $imageArray = [];
+                foreach ($request->images as $imagefile) {
+                    $imagename = $insertId . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
+                    $imagefile->move('uploads/images', $imagename);
+                    array_push($imageArray, $imagename);
+                }
 
-            // foreach ($request->file('images') as $imagefile) {
-            //     $image = new Image;
-            //     $imagename=time().'.'.$imagefile->getClientOriginalExtension();
-            //     $imagefile->move('uploads/images',$imagename);
-            //     $data->image=$imagename;
-            //     $image->save();
-            // }
+                $data->images = json_encode($imageArray);
+                $data->save();
+
+
 
             return response()->json([
                 'message' => 'Congratulations!, your add is up and running',

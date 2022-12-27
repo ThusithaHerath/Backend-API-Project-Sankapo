@@ -31,7 +31,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('category')->group(function () {
-	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.store');
+	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.create');
 	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->middleware('isAdmin')->name('category.list');
 	Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
 	Route::put('update/{id}', 'App\Http\Controllers\Api\CategoriesController@update')->name('category.update');
@@ -39,7 +39,7 @@ Route::prefix('category')->group(function () {
 });
 
 Route::prefix('add')->group(function () {
-	Route::post('create', 'App\Http\Controllers\Api\AddProductsController@create')->name('add.store');
+	Route::post('store', 'App\Http\Controllers\Api\AddProductsController@store')->name('add.store');
 	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('add.show');
 });
 

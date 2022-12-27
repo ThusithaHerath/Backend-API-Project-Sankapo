@@ -21,6 +21,7 @@ class CreateAddProductsTable extends Migration
             $table->string('images');
             $table->string('condition');
             $table->string('buy');
+            $table->integer('owner')->index()->unsigned();
             $table->boolean('isApprove')->default('0');
             $table->timestamps();
         });
