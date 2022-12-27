@@ -71,3 +71,4 @@ Route::prefix('negotiation')->group(function () {
 	Route::post('update/{id}', 'App\Http\Controllers\Api\NegotiationController@update')->name('negotiation.update');
 	// Route::delete('delete/{id}', 'App\Http\Controllers\Api\NegotiationController@destroy')->name('negotiation.delete');
 });
+
