@@ -28,6 +28,7 @@ class PropertiesController extends Controller
             'room_arrangement' => 'required',
 
         ]);
+
         if ($validated) {
             $data = new Property;
             $data->tittle = $request->input('tittle');
@@ -45,20 +46,19 @@ class PropertiesController extends Controller
             $data->room_arrangement = $request->input('room_arrangement');
             // $data->isApprove = $request->input('isApprove');
 
+            $lastId = Property::orderBy('id', 'DESC')->pluck('id');
+            $insertId = json_decode($lastId)[0] + 1;
 
-            $image = $request->images;
-            $imagename = time() . '.' . $image->getClientOriginalExtension();
-            $request->images->move('uploads/images', $imagename);
-            $data->images = $imagename;
+            $imageArray = [];
+            foreach ($request->images as $imagefile) {
+                $imagename = $insertId . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
+                $imagefile->move('uploads/images', $imagename);
+                array_push($imageArray, $imagename);
+            }
+
+
+            $data->images = json_encode($imageArray);
             $data->save();
-
-            // foreach ($request->file('images') as $imagefile) {
-            //     $image = new Image;
-            //     $imagename=time().'.'.$imagefile->getClientOriginalExtension();
-            //     $imagefile->move('uploads/images',$imagename);
-            //     $data->image=$imagename;
-            //     $image->save();
-            // }
 
             return response()->json([
                 'message' => 'Congratulations!, your add is up and running',
@@ -147,20 +147,50 @@ class PropertiesController extends Controller
             $property->electricity = $request->input('electricity');
             $property->restroom = $request->input('restroom');
             $property->room_arrangement = $request->input('room_arrangement');
-            // $property->isApprove = $request->input('isApprove');
 
+            $imageArray = [];
 
-            $image = $request->images;
+            foreach ($request->images as $imagefile) {
+                $newImageName = $property->id . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
 
-            $imagename = time() . '.' . $image->getClientOriginalExtension();
-            $request->images->move('uploads/images', $imagename);
-            $property->images = $imagename;
+                if (file_exists(public_path('uploads/images/' . $imagefile->getClientOriginalName()))) {
+                    unlink(public_path('uploads/images/' . $imagefile->getClientOriginalName()));
+                    $imagefile->move('uploads/images', $newImageName);
+                    array_push($imageArray, $newImageName);
+                } else {
+                    $imagefile->move('uploads/images', $newImageName);
+                    array_push($imageArray, $newImageName);
+                }
+            }
 
+            $property->images = json_encode($imageArray);
             $property->update();
 
             return response()->json([
                 'data' => $property,
                 'message' => 'property updated successfully!',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is no record for this id',
+            ], 500);
+        }
+    }
+
+    public function approveAd(Request $request, $id)
+    {
+        // dd($request);
+        if (Property::where('id', $id)->exists()) {
+            $property  = Property::find($id);
+
+
+            $property->isApprove = '1';
+
+            $property->update();
+
+            return response()->json([
+                'data' => $property,
+                'message' => 'property approved successfully!',
             ], 200);
         } else {
             return response()->json([
