@@ -95,11 +95,16 @@ class AuthController extends Controller
 					'access_token' => $user->createToken($request->email)->plainTextToken
 				], 200);
 			}
+			else{
+				return response()->json([
+					'message' => 'Incorrect Password!',
+				], 403);
+			}
 		}
 		else{
 			return response()->json([
 				'user' => $user,
-				'message' => 'The provided credentials are incorrect!',
+				'message' => 'User not found!',
 			], 401);
 		}
 
