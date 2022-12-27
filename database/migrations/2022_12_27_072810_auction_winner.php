@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class Negotiation extends Migration
+class AuctionWinner extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class Negotiation extends Migration
      */
     public function up()
     {
-        Schema::create('negotiations', function (Blueprint $table) {
+        Schema::create('auction_winners', function (Blueprint $table) {
             $table->id();
-            $table->string('negotiation_price');
-            $table->string('bid_user');
             $table->string('auction_id');
+            $table->string('user_id');
+            $table->string('paid')->default('no'); //yes,no
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class Negotiation extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('negotiations');
+        Schema::dropIfExists('auction_winners');
     }
 }

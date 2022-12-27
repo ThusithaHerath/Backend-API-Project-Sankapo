@@ -48,7 +48,26 @@ Route::prefix('property')->group(function () {
 	Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
 	Route::post('update/{id}', 'App\Http\Controllers\Api\PropertiesController@update')->name('property.update');
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\PropertiesController@destroy')->name('property.delete');
-
-	//not completed
 	Route::post('approve/{id}', 'App\Http\Controllers\Api\PropertiesController@approveAd')->name('property.approve');
+});
+
+
+// auction 
+Route::prefix('auction')->group(function () {
+	Route::post('create', 'App\Http\Controllers\Api\AuctionController@create')->name('auction.store');
+	Route::get('list', 'App\Http\Controllers\Api\AuctionController@showAllActive')->name('auction.list');
+	Route::get('filter/{status}', 'App\Http\Controllers\Api\AuctionController@filterAuctions')->name('auction.listFilter');
+	Route::get('search/{id}', 'App\Http\Controllers\Api\AuctionController@search')->name('auction.search');
+	Route::post('update/{id}', 'App\Http\Controllers\Api\AuctionController@update')->name('auction.update');
+	Route::post('winner/{auction_id}', 'App\Http\Controllers\Api\AuctionController@addWinner')->name('auction.winner');
+	// Route::delete('delete/{id}', 'App\Http\Controllers\Api\AuctionController@destroy')->name('auction.delete');
+});
+
+
+// negotiation 
+Route::prefix('negotiation')->group(function () {
+	Route::post('create', 'App\Http\Controllers\Api\NegotiationController@create')->name('negotiation.store');
+	Route::get('list/{auction_id}', 'App\Http\Controllers\Api\NegotiationController@auctionNegotiations')->name('negotiation.list');
+	Route::post('update/{id}', 'App\Http\Controllers\Api\NegotiationController@update')->name('negotiation.update');
+	// Route::delete('delete/{id}', 'App\Http\Controllers\Api\NegotiationController@destroy')->name('negotiation.delete');
 });

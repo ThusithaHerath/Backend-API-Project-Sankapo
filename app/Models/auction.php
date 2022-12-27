@@ -9,9 +9,8 @@ class auction extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'category',
-        'userId',
         'categoryId',
+        'userId',
         'start_date',
         'start_time',
         'end_date',

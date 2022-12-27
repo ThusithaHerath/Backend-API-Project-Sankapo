@@ -23,8 +23,8 @@ class Auction extends Migration
             $table->time('end_time');
             $table->string('starting_price');
             $table->string('end_price');
-            $table->string('status');
-
+            $table->string('status')->default('active'); //active,completed,cancelled
+            $table->timestamps();
         });
     }
     /**
