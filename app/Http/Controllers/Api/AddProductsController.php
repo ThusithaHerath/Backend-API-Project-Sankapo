@@ -13,32 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AddProductsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(Request $request)
-    {
-       
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -53,7 +28,8 @@ class AddProductsController extends Controller
                 $data->description = $request->input('description');
                 $data->condition = $request->input('condition');
                 $data->buy = $request->input('buy');   
-                $data->owner = Auth::id();    
+                // $data->owner =  $request->input('owner');
+                // Auth::user()->id;   
 
                 $lastId = AddProducts::orderBy('id', 'DESC')->pluck('id');
                 $insertId = json_decode($lastId)[0] + 1;
@@ -95,12 +71,7 @@ class AddProductsController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function show()
     {
         $products = AddProducts::where('isApprove','1')->get()->all();
@@ -116,38 +87,60 @@ class AddProductsController extends Controller
        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function approveAd(Request $request, $id)
     {
-        //
+        if (AddProducts::where('id', $id)->exists()) {
+            $ad  = AddProducts::find($id);
+
+            $ad->isApprove = '1';
+
+            $ad->update();
+
+            return response()->json([
+                'data' => $ad,
+                'message' => 'property approved successfully!',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is no record for this id',
+            ], 500);
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+    public function search($id)
+    {
+        if (AddProducts::where('id', $id)->exists()) {
+            return response()->json([
+                'data' => AddProducts::find($id),
+                'message' => 'Ad fetched successfully!',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is no record for this id',
+            ], 500);
+        }
+    }
+
+
+
     public function update(Request $request, $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        if (AddProducts::where('id', $id)->exists()) {
+            $ad = AddProducts::find($id);
+            $ad->delete();
+            return response()->json([
+                'message' => 'Ad removed successfully!',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is no record for this id',
+            ], 500);
+        }
     }
 
     

@@ -22,6 +22,7 @@ Route::prefix('auth')->group(function () {
 
 	Route::post('/password/email', 'App\Http\Controllers\Api\Auth\AuthController@sendPasswordResetLinkEmail')->middleware('throttle:5,1')->name('password.email');
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
+	
 
 
 	Route::get('account/verify/{token}')->middleware('is_verify_email');
@@ -35,14 +36,16 @@ Route::prefix('category')->group(function () {
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\CategoriesController@destroy')->name('category.delete');
 });
 
-Route::prefix('add')->group(function () {
-	Route::post('store', 'App\Http\Controllers\Api\AddProductsController@store')->name('add.store');
-	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('add.show');
+Route::prefix('ad')->group(function () {
+	Route::post('store', 'App\Http\Controllers\Api\AddProductsController@store')->name('ad.store');
+	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('ad.show');
+	Route::post('approve/{id}', 'App\Http\Controllers\Api\AddProductsController@approveAd')->name('ad.approve');
+	Route::get('search/{id}', 'App\Http\Controllers\Api\AddProductsController@search')->name('ad.search');
 });
 
 // property 
 Route::prefix('property')->group(function () {
-	Route::post('create', 'App\Http\Controllers\Api\PropertiesController@create')->name('property.store');
+	Route::post('store', 'App\Http\Controllers\Api\PropertiesController@create')->name('property.store');
 	Route::get('list', 'App\Http\Controllers\Api\PropertiesController@showAll')->name('property.list');
 	Route::get('list/{status}', 'App\Http\Controllers\Api\PropertiesController@showPropertyAds')->name('property.listFilter');
 	Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
