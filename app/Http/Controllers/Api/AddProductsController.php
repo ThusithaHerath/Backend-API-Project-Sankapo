@@ -10,6 +10,7 @@ use Image;
 use DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class AddProductsController extends Controller
 {
@@ -28,15 +29,13 @@ class AddProductsController extends Controller
                 $data->description = $request->input('description');
                 $data->condition = $request->input('condition');
                 $data->buy = $request->input('buy');   
-                // $data->owner =  $request->input('owner');
-                // Auth::user()->id;   
+                $data->owner =Auth::user()->id; 
 
-                $lastId = AddProducts::orderBy('id', 'DESC')->pluck('id');
-                $insertId = json_decode($lastId)[0] + 1;
-    
                 $imageArray = [];
                 foreach ($request->images as $imagefile) {
-                    $imagename = $insertId . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
+                    $randomString = Str::random(5);
+                    $insertId = $randomString .''. $request->input('title') ;
+                    $imagename = $insertId . '.' . $imagefile->getClientOriginalExtension();
                     $imagefile->move('uploads/images', $imagename);
                     array_push($imageArray, $imagename);
                 }

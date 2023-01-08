@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Property;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PropertiesController extends Controller
 {
@@ -32,26 +33,29 @@ class PropertiesController extends Controller
         if ($validated) {
             $data = new Property;
             $data->tittle = $request->input('tittle');
-            $data->condition = $request->input('condition');
             $data->buy = $request->input('buy');
             $data->province = $request->input('province');
             $data->city = $request->input('city');
             $data->town = $request->input('town');
             $data->residential_type = $request->input('residential_type');
             $data->living_area_square_meters = $request->input('living_area_square_meters');
-            $data->bed_space = $request->input('bed_space');
+            $data->number_of_rooms = $request->input('number_of_rooms');
+            $data->additional_info = $request->input('additional_info');
+            $data->security = $request->input('security');
+            $data->isRentOrSale = $request->input('isRentOrSale');
             $data->running_water = $request->input('running_water');
             $data->electricity = $request->input('electricity');
             $data->restroom = $request->input('restroom');
             $data->room_arrangement = $request->input('room_arrangement');
             // $data->isApprove = $request->input('isApprove');
 
-            $lastId = Property::orderBy('id', 'DESC')->pluck('id');
-            $insertId = json_decode($lastId)[0] + 1;
+        
 
             $imageArray = [];
             foreach ($request->images as $imagefile) {
-                $imagename = $insertId . '_' . uniqid() . '.' . $imagefile->getClientOriginalExtension();
+                $randomString = Str::random(5);
+                $insertId = $randomString .''. $request->input('title') ;
+                $imagename = $insertId .'.' . $imagefile->getClientOriginalExtension();
                 $imagefile->move('uploads/images', $imagename);
                 array_push($imageArray, $imagename);
             }
@@ -134,19 +138,21 @@ class PropertiesController extends Controller
         if (Property::where('id', $id)->exists()) {
             $property  = Property::find($id);
 
-            $property->tittle = $request->input('tittle');
-            $property->condition = $request->input('condition');
-            $property->buy = $request->input('buy');
-            $property->province = $request->input('province');
-            $property->city = $request->input('city');
-            $property->town = $request->input('town');
-            $property->residential_type = $request->input('residential_type');
-            $property->living_area_square_meters = $request->input('living_area_square_meters');
-            $property->bed_space = $request->input('bed_space');
-            $property->running_water = $request->input('running_water');
-            $property->electricity = $request->input('electricity');
-            $property->restroom = $request->input('restroom');
-            $property->room_arrangement = $request->input('room_arrangement');
+            $data->tittle = $request->input('tittle');
+            $data->buy = $request->input('buy');
+            $data->province = $request->input('province');
+            $data->city = $request->input('city');
+            $data->town = $request->input('town');
+            $data->residential_type = $request->input('residential_type');
+            $data->living_area_square_meters = $request->input('living_area_square_meters');
+            $data->number_of_rooms = $request->input('number_of_rooms');
+            $data->additional_info = $request->input('additional_info');
+            $data->security = $request->input('security');
+            $data->isRentOrSale = $request->input('isRentOrSale');
+            $data->running_water = $request->input('running_water');
+            $data->electricity = $request->input('electricity');
+            $data->restroom = $request->input('restroom');
+            $data->room_arrangement = $request->input('room_arrangement');
 
             $imageArray = [];
 

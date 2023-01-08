@@ -30,7 +30,7 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('category')->group(function () {
 	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.create');
-	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->middleware('isAdmin')->name('category.list');
+	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->name('category.list');
 	Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
 	Route::put('update/{id}', 'App\Http\Controllers\Api\CategoriesController@update')->name('category.update');
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\CategoriesController@destroy')->name('category.delete');
