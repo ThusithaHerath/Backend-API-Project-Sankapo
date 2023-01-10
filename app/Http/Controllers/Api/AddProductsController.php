@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\AddProducts;
+use App\Models\ads;
 use File;
 use Image;
 use DB;
@@ -20,25 +20,36 @@ class AddProductsController extends Controller
         $validated = $request->validate([
             'title' => 'required',
             'category' => 'required',
-            'condition' => 'required'
+            'condition' => 'required',
+            'description' => 'required',
+            'buy' => 'required',
+            'owner' => 'required',
+            'mobile' => 'required',
+            'landline' => 'required',
+            'email' => 'required'
         ]);
         if($validated){
-                $data = new AddProducts;
+                $data = new ads;
                 $data->title = $request->input('title');
                 $data->category = $request->input('category');
                 $data->description = $request->input('description');
                 $data->condition = $request->input('condition');
                 $data->buy = $request->input('buy');   
-                $data->owner =Auth::user()->id; 
+                $data->mobile = $request->input('mobile');  
+                $data->landline = $request->input('landline');  
+                $data->email = $request->input('email');  
+                $data->owner =$request->input('owner'); 
 
+                $images = $request->file('images');
                 $imageArray = [];
-                foreach ($request->images as $imagefile) {
+                foreach ($images as $imagefile) {
                     $randomString = Str::random(5);
-                    $insertId = $randomString .''. $request->input('title') ;
+                    $insertId = $randomString .''. $request->input('title');
                     $imagename = $insertId . '.' . $imagefile->getClientOriginalExtension();
                     $imagefile->move('uploads/images', $imagename);
                     array_push($imageArray, $imagename);
                 }
+                
 
                 $data->images = json_encode($imageArray);
                 $data->save();
@@ -57,7 +68,7 @@ class AddProductsController extends Controller
     }
 
     public function approve($id){
-        $isApprove = DB::table('add_products')->where('id',$id)->update(['isApprove'=>'1']);
+        $isApprove = DB::table('ads')->where('id',$id)->update(['isApprove'=>'1']);
         if($isApprove){
             return response()->json([
                 'message' => 'Your add has been approved',
@@ -71,12 +82,34 @@ class AddProductsController extends Controller
     }
 
 
-    public function show()
+    public function showAll()
     {
-        $products = AddProducts::where('isApprove','1')->get()->all();
-        if($products){
+        //status = 0 newly added ads
+
+        //status = 1 approved ads
+        //status = 2 declined ads
+        $ads = ads::get()->all();
+        if($ads){
             return response()->json([
-                'data' => $products,
+                'data' => $ads,
+            ], 200);
+        }else{
+            return response()->json([
+                'message' => "Can't find ads",
+            ], 500);
+        }
+       
+    }
+
+    public function approved()
+    {
+        //status = 0 newly added ads
+        //status = 1 approved ads
+        //status = 2 declined ads
+        $ads = ads::where('isApprove','1')->get()->all();
+        if($ads){
+            return response()->json([
+                'data' => $ads,
             ], 200);
         }else{
             return response()->json([
@@ -86,18 +119,54 @@ class AddProductsController extends Controller
        
     }
 
+    public function declined()
+    {
+        //status = 0 newly added ads
+        //status = 1 approved ads
+        //status = 2 declined ads
+        $ads = ads::where('isApprove','2')->get()->all();
+        if($ads){
+            return response()->json([
+                'data' => $ads,
+            ], 200);
+        }else{
+            return response()->json([
+                'message' => "Can't find declined adds",
+            ], 500);
+        }
+       
+    }
+
     public function approveAd(Request $request, $id)
     {
-        if (AddProducts::where('id', $id)->exists()) {
-            $ad  = AddProducts::find($id);
-
+        if (ads::where('id', $id)->exists()) {
+            $ad  = ads::find($id);
             $ad->isApprove = '1';
+            $ad->update();
+
+            return response()->json([
+                'data' => $ad,
+                'message' => 'Ad has been approved successfully!',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'There is no record for this id',
+            ], 500);
+        }
+    }
+
+    public function declineAd(Request $request, $id)
+    {
+        if (ads::where('id', $id)->exists()) {
+            $ad  = ads::find($id);
+
+            $ad->isApprove = '2';
 
             $ad->update();
 
             return response()->json([
                 'data' => $ad,
-                'message' => 'property approved successfully!',
+                'message' => 'Ad has been declined successfully!',
             ], 200);
         } else {
             return response()->json([
@@ -108,9 +177,9 @@ class AddProductsController extends Controller
 
     public function search($id)
     {
-        if (AddProducts::where('id', $id)->exists()) {
+        if (ads::where('id', $id)->exists()) {
             return response()->json([
-                'data' => AddProducts::find($id),
+                'data' => ads::find($id),
                 'message' => 'Ad fetched successfully!',
             ], 200);
         } else {
@@ -118,6 +187,14 @@ class AddProductsController extends Controller
                 'message' => 'There is no record for this id',
             ], 500);
         }
+    }
+
+    public function latestAds(){
+        $latestAds = DB::table('ads')->orderBy('created_at', 'desc')->first();
+        return response()->json([
+            'data' => $latestAds,
+            'message' => 'Latest ads fetched successfully!',
+        ], 200);
     }
 
 
@@ -129,8 +206,8 @@ class AddProductsController extends Controller
 
     public function destroy($id)
     {
-        if (AddProducts::where('id', $id)->exists()) {
-            $ad = AddProducts::find($id);
+        if (ads::where('id', $id)->exists()) {
+            $ad = ads::find($id);
             $ad->delete();
             return response()->json([
                 'message' => 'Ad removed successfully!',

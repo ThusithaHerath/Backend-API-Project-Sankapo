@@ -32,7 +32,11 @@ class Properties extends Migration
             $table->string('additional_info');
             $table->string("security");
             $table->string("isRentOrSale");
+            $table->string('mobile');
+            $table->string('landline');
+            $table->string('email');
             $table->string('isApprove')->default('0');
+            $table->integer('owner')->index()->unsigned();
             $table->timestamps();
         });
     }

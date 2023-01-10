@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Mail\VerifyEmail;
 use App\Notifications\Announcement;
 use Mail;
+use DB;
 
 use function Psy\info;
 
@@ -177,6 +178,20 @@ class AuthController extends Controller
 			throw ValidationException::withMessages([
 				'email' => __($status)
 			]);
+		}
+	}
+
+	public function changePassword(Request $request, $id){
+		$userExists = User::where('id','=', $id)->where('role','1')->exists();
+		if ($userExists) {
+			DB::table('users')->where('id',$id)->update(['password'=>Hash::make($request->password)]);
+			return response()->json([
+				'message' => 'Password changed successfully!',
+			], 200);
+		}else{
+			return response()->json([
+				'message' => 'Sorry, User not found!',
+			], 401);
 		}
 	}
 }

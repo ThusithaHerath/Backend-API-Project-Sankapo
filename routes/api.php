@@ -22,6 +22,9 @@ Route::prefix('auth')->group(function () {
 
 	Route::post('/password/email', 'App\Http\Controllers\Api\Auth\AuthController@sendPasswordResetLinkEmail')->middleware('throttle:5,1')->name('password.email');
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
+
+	//change password of admin 
+	Route::post('/password/change/{id}', 'App\Http\Controllers\Api\Auth\AuthController@changePassword')->name('password.change');
 	
 
 
@@ -38,20 +41,28 @@ Route::prefix('category')->group(function () {
 
 Route::prefix('ad')->group(function () {
 	Route::post('store', 'App\Http\Controllers\Api\AddProductsController@store')->name('ad.store');
-	Route::get('show', 'App\Http\Controllers\Api\AddProductsController@show')->name('ad.show');
+	Route::get('showAll', 'App\Http\Controllers\Api\AddProductsController@showAll')->name('ad.showAll');
+	Route::get('approved', 'App\Http\Controllers\Api\AddProductsController@approved')->name('ad.approved');
+	Route::get('declined', 'App\Http\Controllers\Api\AddProductsController@declined')->name('ad.declined');
 	Route::post('approve/{id}', 'App\Http\Controllers\Api\AddProductsController@approveAd')->name('ad.approve');
+	Route::post('decline/{id}', 'App\Http\Controllers\Api\AddProductsController@declineAd')->name('ad.decline');
 	Route::get('search/{id}', 'App\Http\Controllers\Api\AddProductsController@search')->name('ad.search');
+	Route::get('latest', 'App\Http\Controllers\Api\AddProductsController@latestAds')->name('ad.latest');
 });
 
 // property 
 Route::prefix('property')->group(function () {
 	Route::post('store', 'App\Http\Controllers\Api\PropertiesController@create')->name('property.store');
-	Route::get('list', 'App\Http\Controllers\Api\PropertiesController@showAll')->name('property.list');
-	Route::get('list/{status}', 'App\Http\Controllers\Api\PropertiesController@showPropertyAds')->name('property.listFilter');
-	Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
+	Route::get('showAll', 'App\Http\Controllers\Api\PropertiesController@showAll')->name('property.showAll');
+	Route::get('approved', 'App\Http\Controllers\Api\PropertiesController@approved')->name('property.approved');
+	Route::get('declined', 'App\Http\Controllers\Api\PropertiesController@declined')->name('property.declined');
+	Route::post('approve/{id}', 'App\Http\Controllers\Api\PropertiesController@approveAd')->name('property.approve');
+	Route::post('declined/{id}', 'App\Http\Controllers\Api\PropertiesController@declined')->name('property.declined');
+	Route::get('latest', 'App\Http\Controllers\Api\PropertiesController@latestProperties')->name('property.latest');
+	// Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
 	Route::post('update/{id}', 'App\Http\Controllers\Api\PropertiesController@update')->name('property.update');
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\PropertiesController@destroy')->name('property.delete');
-	Route::post('approve/{id}', 'App\Http\Controllers\Api\PropertiesController@approveAd')->name('property.approve');
+
 });
 
 

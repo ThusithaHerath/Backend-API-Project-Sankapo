@@ -23,6 +23,9 @@ class Property extends Model
         'electricity',
         'restroom',
         'room_arrangement',
-        'isApprove'
+        'isApprove',
+        'mobile',
+        'landline',
+        'email'
     ];
 }
