@@ -21,11 +21,12 @@ Route::prefix('auth')->group(function () {
 	Route::get('user', 'App\Http\Controllers\Api\Auth\AuthController@getAuthenticatedUser')->middleware('auth:sanctum')->name('auth.user');
 
 	Route::post('/password/email', 'App\Http\Controllers\Api\Auth\AuthController@sendPasswordResetLinkEmail')->middleware('throttle:5,1')->name('password.email');
+	Route::get('/password/reset/{token}', 'App\Http\Controllers\Api\Auth\AuthController@showResetForm')->middleware('web')->name('password.reset.form');
 	Route::post('/password/reset', 'App\Http\Controllers\Api\Auth\AuthController@resetPassword')->name('password.reset');
 
 	//change password of admin 
 	Route::post('/password/change/{id}', 'App\Http\Controllers\Api\Auth\AuthController@changePassword')->name('password.change');
-	
+
 
 
 	Route::get('account/verify/{token}')->middleware('is_verify_email');
@@ -62,7 +63,6 @@ Route::prefix('property')->group(function () {
 	// Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
 	Route::post('update/{id}', 'App\Http\Controllers\Api\PropertiesController@update')->name('property.update');
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\PropertiesController@destroy')->name('property.delete');
-
 });
 
 
@@ -85,4 +85,3 @@ Route::prefix('negotiation')->group(function () {
 	Route::post('update/{id}', 'App\Http\Controllers\Api\NegotiationController@update')->name('negotiation.update');
 	// Route::delete('delete/{id}', 'App\Http\Controllers\Api\NegotiationController@destroy')->name('negotiation.delete');
 });
-

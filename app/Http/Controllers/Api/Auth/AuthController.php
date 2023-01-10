@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Models\UserVerify;
+use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Mail\VerifyEmail;
+use App\Models\passwordResets;
 use App\Notifications\Announcement;
 use Mail;
 use DB;
@@ -88,27 +90,24 @@ class AuthController extends Controller
 
 		$user = User::where('email', $request->email)->first();
 
-		if($user){
+		if ($user) {
 			if (Hash::check($request->password, $user->password)) {
 				return response()->json([
 					'user' => $user,
 					'message' => 'Successfully logged in!',
 					'access_token' => $user->createToken($request->email)->plainTextToken
 				], 200);
-			}
-			else{
+			} else {
 				return response()->json([
 					'message' => 'Incorrect Password!',
 				], 403);
 			}
-		}
-		else{
+		} else {
 			return response()->json([
 				'user' => $user,
 				'message' => 'User not found!',
 			], 401);
 		}
-
 	}
 
 
@@ -136,59 +135,80 @@ class AuthController extends Controller
 
 	public function sendPasswordResetLinkEmail(Request $request)
 	{
-		$request->validate(['email' => 'required|email']);
 
-		$status = Password::sendResetLink(
-			$request->only('email')
-		);
+		$request->validate([
+			'email' => 'required|email|exists:users,email'
+		]);
 
-		if ($status === Password::RESET_LINK_SENT) {
-			return response()->json(['message' => __($status)], 200);
-		} else {
-			throw ValidationException::withMessages([
-				'email' => __($status)
-			]);
-		}
+		$token = Str::random(64);
+
+		$passwordReset = new PasswordResets();
+		$passwordReset->email = $request->input('email');
+		$passwordReset->token = $token;
+		$passwordReset->created_at = Carbon::now();
+
+		$passwordReset->save();
+
+
+		$action_link = route('password.reset.form', ['token' => $token, 'email' => $request->email]);
+		$body = "We are received a request to reset the password for <b>Sankapo </b> account associated with " . $request->email . ". You can reset your password by clicking the link below";
+
+		Mail::send('notifications.email-forgot', ['action_link' => $action_link, 'body' => $body], function ($message) use ($request) {
+			$message->from('noreply@example.com', 'Sankapo');
+			$message->to($request->email, 'Your name')
+				->subject('Reset Password');
+		});
+
+		return back()->with('success', 'We have e-mailed your password reset link!');
 	}
+
+
+
+	public function showResetForm(Request $request, $token = null)
+	{
+		return view('resetPasswords.resetPassword')->with(['token' => $token, 'email' => $request->email]);
+	}
+
 
 	public function resetPassword(Request $request)
 	{
+
 		$request->validate([
-			'token' => 'required',
-			'email' => 'required|email',
-			'password' => 'required|min:8|confirmed',
+			'email' => 'required|email|exists:users,email',
+			'password' => 'required|min:5|confirmed',
+			'password_confirmation' => 'required',
 		]);
 
-		$status = Password::reset(
-			$request->only('email', 'password', 'password_confirmation', 'token'),
-			function ($user, $password) use ($request) {
-				$user->forceFill([
-					'password' => Hash::make($password)
-				])->setRememberToken(Str::random(60));
+		$check_token = passwordResets::where('email', $request->email)->first();
 
-				$user->save();
-
-				event(new PasswordReset($user));
-			}
-		);
-
-		if ($status == Password::PASSWORD_RESET) {
-			return response()->json(['message' => __($status)], 200);
+		if (!$check_token) {
+			return back()->withInput()->with('fail', 'Invalid token');
 		} else {
-			throw ValidationException::withMessages([
-				'email' => __($status)
+
+			User::where(
+				'email',
+				$request->email
+			)->update([
+				'password' => Hash::make($request->password)
 			]);
+
+			passwordResets::where([
+				'email' => $request->email
+			])->delete();
+
+			return redirect()->route('auth.login')->with('info', 'Your password has been changed! You can login with new password')->with('verifiedEmail', $request->email);
 		}
 	}
 
-	public function changePassword(Request $request, $id){
-		$userExists = User::where('id','=', $id)->where('role','1')->exists();
+	public function changePassword(Request $request, $id)
+	{
+		$userExists = User::where('id', '=', $id)->where('role', '1')->exists();
 		if ($userExists) {
-			DB::table('users')->where('id',$id)->update(['password'=>Hash::make($request->password)]);
+			DB::table('users')->where('id', $id)->update(['password' => Hash::make($request->password)]);
 			return response()->json([
 				'message' => 'Password changed successfully!',
 			], 200);
-		}else{
+		} else {
 			return response()->json([
 				'message' => 'Sorry, User not found!',
 			], 401);
