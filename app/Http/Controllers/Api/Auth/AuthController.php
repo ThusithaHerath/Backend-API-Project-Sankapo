@@ -17,6 +17,7 @@ use App\Models\passwordResets;
 use App\Notifications\Announcement;
 use Mail;
 use DB;
+use Redirect;
 
 use function Psy\info;
 
@@ -196,9 +197,8 @@ class AuthController extends Controller
 				'email' => $request->email
 			])->delete();
 
-			// return redirect()->route('auth.login')->with('info', 'Your password has been changed! You can login with new password')->with('verifiedEmail', $request->email);
-
-			return redirect(env('APP_URL'));
+	
+			return redirect()->away("https://Sankapo.com/login");
 		}
 	}
 

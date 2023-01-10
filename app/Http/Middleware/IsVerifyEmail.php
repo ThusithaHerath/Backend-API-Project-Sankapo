@@ -31,6 +31,7 @@ class IsVerifyEmail
                 $verifyUser->user->is_email_verified = 1;
                 $verifyUser->user->save();
                 $message = "Your e-mail is verified. You can now login.";
+                return view('welcome');
             } else {
                 $message = "Your e-mail is already verified. You can now login.";
             }
