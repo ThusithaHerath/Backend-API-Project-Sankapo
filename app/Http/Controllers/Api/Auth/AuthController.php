@@ -145,7 +145,7 @@ class AuthController extends Controller
 		$passwordReset = new PasswordResets();
 		$passwordReset->email = $request->input('email');
 		$passwordReset->token = $token;
-		$passwordReset->created_at = Carbon::now();
+		// $passwordReset->created_at = Carbon::now();
 
 		$passwordReset->save();
 
@@ -196,7 +196,9 @@ class AuthController extends Controller
 				'email' => $request->email
 			])->delete();
 
-			return redirect()->route('auth.login')->with('info', 'Your password has been changed! You can login with new password')->with('verifiedEmail', $request->email);
+			// return redirect()->route('auth.login')->with('info', 'Your password has been changed! You can login with new password')->with('verifiedEmail', $request->email);
+
+			return redirect(env('APP_URL'));
 		}
 	}
 
