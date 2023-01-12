@@ -30,6 +30,7 @@ Route::prefix('auth')->group(function () {
 
 
 	Route::get('account/verify/{token}')->middleware('is_verify_email');
+	Route::get('account/verified/{msg}', 'App\Http\Controllers\Api\Auth\AuthController@verifiedEmail')->name('account.verified');
 });
 
 Route::prefix('category')->group(function () {

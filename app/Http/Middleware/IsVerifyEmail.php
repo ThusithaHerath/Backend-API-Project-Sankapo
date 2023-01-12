@@ -30,14 +30,15 @@ class IsVerifyEmail
             if (!$user->is_email_verified) {
                 $verifyUser->user->is_email_verified = 1;
                 $verifyUser->user->save();
+
                 $message = "Your e-mail is verified. You can now login.";
-                return view('welcome');
             } else {
                 $message = "Your e-mail is already verified. You can now login.";
             }
         }
-        return response()->json([
-            'message' => $message,
-        ], 200);
+        return redirect()->action(
+            'App\Http\Controllers\Api\Auth\AuthController@verifiedEmail',
+            ['msg' => $message]
+        );
     }
 }

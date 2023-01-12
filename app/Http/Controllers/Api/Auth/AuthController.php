@@ -197,7 +197,7 @@ class AuthController extends Controller
 				'email' => $request->email
 			])->delete();
 
-	
+
 			return redirect()->away("https://Sankapo.com/login");
 		}
 	}
@@ -215,5 +215,9 @@ class AuthController extends Controller
 				'message' => 'Sorry, User not found!',
 			], 401);
 		}
+	}
+	public function verifiedEmail(Request $request, $msg)
+	{
+		return view('verifyEmail.verifiedEmail')->with('msg', $msg);
 	}
 }
