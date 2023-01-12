@@ -24,6 +24,10 @@ class CreateAdsTable extends Migration
             $table->string('mobile');
             $table->string('landline');
             $table->string('email');
+            $table->string('province');
+            $table->string('city');
+            $table->string('town');
+            $table->string('sellerName');
             $table->integer('owner')->index()->unsigned();
             $table->boolean('isApprove')->default('0');
             $table->timestamps();

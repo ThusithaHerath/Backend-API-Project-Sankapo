@@ -34,7 +34,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('category')->group(function () {
-	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.create');
+	Route::post('store', 'App\Http\Controllers\Api\CategoriesController@store')->name('category.store');
 	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->name('category.list');
 	Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
 	Route::put('update/{id}', 'App\Http\Controllers\Api\CategoriesController@update')->name('category.update');
@@ -50,6 +50,7 @@ Route::prefix('ad')->group(function () {
 	Route::post('decline/{id}', 'App\Http\Controllers\Api\AddProductsController@declineAd')->name('ad.decline');
 	Route::get('search/{id}', 'App\Http\Controllers\Api\AddProductsController@search')->name('ad.search');
 	Route::get('latest', 'App\Http\Controllers\Api\AddProductsController@latestAds')->name('ad.latest');
+	Route::get('searchbycategory/{id}','App\Http\Controllers\Api\AddProductsController@searchbycategory')->name('ad.searchbycategory');
 });
 
 // property 
@@ -59,7 +60,7 @@ Route::prefix('property')->group(function () {
 	Route::get('approved', 'App\Http\Controllers\Api\PropertiesController@approved')->name('property.approved');
 	Route::get('declined', 'App\Http\Controllers\Api\PropertiesController@declined')->name('property.declined');
 	Route::post('approve/{id}', 'App\Http\Controllers\Api\PropertiesController@approveAd')->name('property.approve');
-	Route::post('declined/{id}', 'App\Http\Controllers\Api\PropertiesController@declined')->name('property.declined');
+	Route::post('decline/{id}', 'App\Http\Controllers\Api\PropertiesController@decline')->name('property.decline');
 	Route::get('latest', 'App\Http\Controllers\Api\PropertiesController@latestProperties')->name('property.latest');
 	// Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
 	Route::post('update/{id}', 'App\Http\Controllers\Api\PropertiesController@update')->name('property.update');

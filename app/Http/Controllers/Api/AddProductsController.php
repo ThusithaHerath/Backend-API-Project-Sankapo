@@ -38,6 +38,10 @@ class AddProductsController extends Controller
                 $data->mobile = $request->input('mobile');  
                 $data->landline = $request->input('landline');  
                 $data->email = $request->input('email');  
+                $data->province = $request->input('province'); 
+                $data->city = $request->input('city'); 
+                $data->town = $request->input('town'); 
+                $data->sellerName = $request->input('sellerName'); 
                 $data->owner =$request->input('owner'); 
 
                 $images = $request->file('images');
@@ -197,6 +201,13 @@ class AddProductsController extends Controller
         ], 200);
     }
 
+    public function searchbycategory($id){
+        // $results = DB::table('ads')->where('category',$id)->get();
+        return response()->json([
+            'data' => $results,
+            'message' => 'Search by category ads fetched successfully!',
+        ], 200);
+    }
 
 
     public function update(Request $request, $id)
