@@ -32,6 +32,7 @@ class IsVerifyEmail
                 $verifyUser->user->save();
 
                 $message = "Your e-mail is verified. You can now login.";
+               
             } else {
                 $message = "Your e-mail is already verified. You can now login.";
             }

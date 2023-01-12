@@ -137,30 +137,39 @@ class AuthController extends Controller
 	public function sendPasswordResetLinkEmail(Request $request)
 	{
 
-		$request->validate([
+		$validated = $request->validate([
 			'email' => 'required|email|exists:users,email'
 		]);
 
-		$token = Str::random(64);
+		if($validated){
+			$token = Str::random(64);
 
-		$passwordReset = new PasswordResets();
-		$passwordReset->email = $request->input('email');
-		$passwordReset->token = $token;
-		// $passwordReset->created_at = Carbon::now();
-
-		$passwordReset->save();
-
-
-		$action_link = route('password.reset.form', ['token' => $token, 'email' => $request->email]);
-		$body = "We are received a request to reset the password for <b>Sankapo </b> account associated with " . $request->email . ". You can reset your password by clicking the link below";
-
-		Mail::send('notifications.email-forgot', ['action_link' => $action_link, 'body' => $body], function ($message) use ($request) {
-			$message->from('noreply@example.com', 'Sankapo');
-			$message->to($request->email, 'Your name')
-				->subject('Reset Password');
-		});
-
-		return back()->with('success', 'We have e-mailed your password reset link!');
+			$passwordReset = new PasswordResets();
+			$passwordReset->email = $request->input('email');
+			$passwordReset->token = $token;
+			// $passwordReset->created_at = Carbon::now();
+	
+			$passwordReset->save();
+	
+	
+			$action_link = route('password.reset.form', ['token' => $token, 'email' => $request->email]);
+			$body = "We are received a request to reset the password for <b>Sankapo </b> account associated with " . $request->email . ". You can reset your password by clicking the link below";
+	
+			Mail::send('notifications.email-forgot', ['action_link' => $action_link, 'body' => $body], function ($message) use ($request) {
+				$message->from('noreply@example.com', 'Sankapo');
+				$message->to($request->email, 'Your name')
+					->subject('Reset Password');
+			});
+	
+			return response()->json([
+				'message' => 'We have emailed your password reset link, Please check your inbox!',
+			], 200);
+		}
+		else{
+			return response()->json([
+				'message' => 'Please check your email!',
+			], 500);
+		}
 	}
 
 
