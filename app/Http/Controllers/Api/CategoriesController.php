@@ -15,21 +15,13 @@ class CategoriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request)
-    {
-        
 
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -37,7 +29,7 @@ class CategoriesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function create(Request $request)
     {
         if (Categories::where('category','=', $request->input('category'))->exists()) {
 			return response()->json([
@@ -46,6 +38,12 @@ class CategoriesController extends Controller
 		}else{
             $category = new Categories();
             $category->category = $request->input('category');
+
+            $icon = $request->file('icon');
+            $iconname=time().'.'.$icon->getClientOriginalExtension();
+            $request->icon->move('uploads/icons',$iconname);
+            $category->icon=$iconname;
+
             $category->save();
 
             return response()->json([
@@ -76,6 +74,9 @@ class CategoriesController extends Controller
             ], 200);        
         } 
     }
+   
+
+
 
     /**
      * Show the form for editing the specified resource.

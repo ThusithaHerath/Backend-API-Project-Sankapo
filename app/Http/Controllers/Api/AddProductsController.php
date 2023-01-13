@@ -201,14 +201,13 @@ class AddProductsController extends Controller
         ], 200);
     }
 
-    public function searchbycategory($id){
-        // $results = DB::table('ads')->where('category',$id)->get();
+    public function searchbycat(Request $request){
+        $results = DB::table('ads')->where('category',$id)->get();
         return response()->json([
             'data' => $results,
             'message' => 'Search by category ads fetched successfully!',
         ], 200);
     }
-
 
     public function update(Request $request, $id)
     {

@@ -34,7 +34,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('category')->group(function () {
-	Route::post('store', 'App\Http\Controllers\Api\CategoriesController@store')->name('category.store');
+	Route::post('create', 'App\Http\Controllers\Api\CategoriesController@create')->name('category.create');
 	Route::get('list', 'App\Http\Controllers\Api\CategoriesController@show')->name('category.list');
 	Route::get('edit/{id}', 'App\Http\Controllers\Api\CategoriesController@edit')->name('category.edit');
 	Route::put('update/{id}', 'App\Http\Controllers\Api\CategoriesController@update')->name('category.update');
@@ -50,7 +50,7 @@ Route::prefix('ad')->group(function () {
 	Route::post('decline/{id}', 'App\Http\Controllers\Api\AddProductsController@declineAd')->name('ad.decline');
 	Route::get('search/{id}', 'App\Http\Controllers\Api\AddProductsController@search')->name('ad.search');
 	Route::get('latest', 'App\Http\Controllers\Api\AddProductsController@latestAds')->name('ad.latest');
-	Route::get('searchbycategory/{id}','App\Http\Controllers\Api\AddProductsController@searchbycategory')->name('ad.searchbycategory');
+	Route::get('searchbycat/{id}', 'App\Http\Controllers\Api\AddProductsController@searchbycat')->name('ad.searchbycat');
 });
 
 // property 
@@ -87,3 +87,4 @@ Route::prefix('negotiation')->group(function () {
 	Route::post('update/{id}', 'App\Http\Controllers\Api\NegotiationController@update')->name('negotiation.update');
 	// Route::delete('delete/{id}', 'App\Http\Controllers\Api\NegotiationController@destroy')->name('negotiation.delete');
 });
+
