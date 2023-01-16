@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Mail\VerifyEmail;
 use App\Models\passwordResets;
+use App\Models\ads;
 use App\Notifications\Announcement;
 use Mail;
 use DB;
@@ -122,6 +123,36 @@ class AuthController extends Controller
 		$request->user()->currentAccessToken()->delete();
 		//$request->user->tokens()->delete(); // use this to revoke all tokens (logout from all devices)
 		return response()->json(null, 200);
+	}
+
+	public function mylistings(Request $request, $id){
+		$data =  DB::table('ads')->where('owner',$id)->get();
+		if($data){
+			return response()->json([
+				'data' => $data,
+                'message' => 'Ads fetched successfully!',
+            ], 200);
+		}else{
+			return response()->json([
+                'message' => 'There is no ads to show for this id',
+            ], 401);
+		}
+	
+	}
+
+	public function myprofile(Request $request, $id){
+		$data =  DB::table('users')->where('id',$id)->get();
+		if($data){
+			return response()->json([
+				'data' => $data,
+                'message' => 'Myprofile fetched successfully!',
+            ], 200);
+		}else{
+			return response()->json([
+                'message' => 'There is no record  for this id',
+            ], 401);
+		}
+	
 	}
 
 

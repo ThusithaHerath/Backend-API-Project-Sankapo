@@ -201,7 +201,7 @@ class AddProductsController extends Controller
         ], 200);
     }
 
-    public function searchbycat(Request $request){
+    public function searchbycat(Request $request, $id){
         $results = DB::table('ads')->where('category',$id)->get();
         return response()->json([
             'data' => $results,

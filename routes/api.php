@@ -27,10 +27,13 @@ Route::prefix('auth')->group(function () {
 	//change password of admin 
 	Route::post('/password/change/{id}', 'App\Http\Controllers\Api\Auth\AuthController@changePassword')->name('password.change');
 
-
-
 	Route::get('account/verify/{token}')->middleware('is_verify_email');
 	Route::get('account/verified/{msg}', 'App\Http\Controllers\Api\Auth\AuthController@verifiedEmail')->name('account.verified');
+});
+
+Route::prefix('profile')->group(function(){
+	Route::get('/mylistings/{id}', 'App\Http\Controllers\Api\Auth\AuthController@mylistings')->name('profile.mylistings');
+	Route::get('/myprofile/{id]', 'App\Http\Controllers\Api\Auth\AuthController@myprofile')->name('profile.myprofile');
 });
 
 Route::prefix('category')->group(function () {
@@ -62,7 +65,7 @@ Route::prefix('property')->group(function () {
 	Route::post('approve/{id}', 'App\Http\Controllers\Api\PropertiesController@approveAd')->name('property.approve');
 	Route::post('decline/{id}', 'App\Http\Controllers\Api\PropertiesController@decline')->name('property.decline');
 	Route::get('latest', 'App\Http\Controllers\Api\PropertiesController@latestProperties')->name('property.latest');
-	// Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
+	Route::get('search/{id}', 'App\Http\Controllers\Api\PropertiesController@search')->name('property.search');
 	Route::post('update/{id}', 'App\Http\Controllers\Api\PropertiesController@update')->name('property.update');
 	Route::delete('delete/{id}', 'App\Http\Controllers\Api\PropertiesController@destroy')->name('property.delete');
 });
