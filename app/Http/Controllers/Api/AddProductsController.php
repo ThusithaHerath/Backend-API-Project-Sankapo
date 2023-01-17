@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ads;
 use File;
-use Image;
-use DB;
+
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class AddProductsController extends Controller
 {
@@ -28,57 +29,73 @@ class AddProductsController extends Controller
             'landline' => 'required',
             'email' => 'required'
         ]);
-        if($validated){
-                $data = new ads;
-                $data->title = $request->input('title');
-                $data->category = $request->input('category');
-                $data->description = $request->input('description');
-                $data->condition = $request->input('condition');
-                $data->buy = $request->input('buy');   
-                $data->mobile = $request->input('mobile');  
-                $data->landline = $request->input('landline');  
-                $data->email = $request->input('email');  
-                $data->province = $request->input('province'); 
-                $data->city = $request->input('city'); 
-                $data->town = $request->input('town'); 
-                $data->sellerName = $request->input('sellerName'); 
-                $data->owner =$request->input('owner'); 
+        if ($validated) {
+            $data = new ads;
+            $data->title = $request->input('title');
+            $data->category = $request->input('category');
+            $data->description = $request->input('description');
+            $data->condition = $request->input('condition');
+            $data->buy = $request->input('buy');
+            $data->mobile = $request->input('mobile');
+            $data->landline = $request->input('landline');
+            $data->email = $request->input('email');
+            $data->province = $request->input('province');
+            $data->city = $request->input('city');
+            $data->town = $request->input('town');
+            $data->sellerName = $request->input('sellerName');
+            $data->owner = $request->input('owner');
 
-                $images = $request->file('images');
-                $imageArray = [];
-                foreach ($images as $imagefile) {
-                    $randomString = Str::random(5);
-                    $insertId = $randomString .''. $request->input('title');
-                    $imagename = $insertId . '.' . $imagefile->getClientOriginalExtension();
-                    $imagefile->move('uploads/images', $imagename);
-                    array_push($imageArray, $imagename);
-                }
-                
+            $images = $request->file('images');
+            $imageArray = [];
+            foreach ($images as $imagefile) {
+                $randomString = Str::random(5);
+                $insertId = $randomString . '' . $request->input('title');
+                $imagename = $insertId . '.' . $imagefile->getClientOriginalExtension();
 
-                $data->images = json_encode($imageArray);
-                $data->save();
+                $img = Image::make($imagefile->getRealPath());
+                $imageWidth = $img->width();
+                $watermarkSource =  Image::make(public_path('common/watermark.png'));
+
+                $watermarkSize = round(20 * $imageWidth / 50);
+                $watermarkSource->resize($watermarkSize, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+
+                $img->insert($watermarkSource, 'center', 0, 0);
+
+
+                $img->resize(500, 500, function ($const) {
+                    $const->aspectRatio();
+                })->save(public_path('/uploads/images') . '/' . $imagename);
+
+                // $imagefile->move('uploads/images', $imagename);
+                array_push($imageArray, $imagename);
+            }
+
+
+            $data->images = json_encode($imageArray);
+            $data->save();
 
 
 
             return response()->json([
                 'message' => 'Congratulations!, your add is up and running',
             ], 200);
-
-        }else{
+        } else {
             return response()->json([
                 'message' => 'Error while posting add!',
             ], 500);
         }
     }
 
-    public function approve($id){
-        $isApprove = DB::table('ads')->where('id',$id)->update(['isApprove'=>'1']);
-        if($isApprove){
+    public function approve($id)
+    {
+        $isApprove = DB::table('ads')->where('id', $id)->update(['isApprove' => '1']);
+        if ($isApprove) {
             return response()->json([
                 'message' => 'Your add has been approved',
             ], 200);
-        }
-        else{
+        } else {
             return response()->json([
                 'message' => 'Error while approving add!',
             ], 500);
@@ -93,16 +110,15 @@ class AddProductsController extends Controller
         //status = 1 approved ads
         //status = 2 declined ads
         $ads = ads::get()->all();
-        if($ads){
+        if ($ads) {
             return response()->json([
                 'data' => $ads,
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'message' => "Can't find ads",
             ], 500);
         }
-       
     }
 
     public function approved()
@@ -110,17 +126,16 @@ class AddProductsController extends Controller
         //status = 0 newly added ads
         //status = 1 approved ads
         //status = 2 declined ads
-        $ads = ads::where('isApprove','1')->get()->all();
-        if($ads){
+        $ads = ads::where('isApprove', '1')->get()->all();
+        if ($ads) {
             return response()->json([
                 'data' => $ads,
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'message' => "Can't find approved adds",
             ], 500);
         }
-       
     }
 
     public function declined()
@@ -128,17 +143,16 @@ class AddProductsController extends Controller
         //status = 0 newly added ads
         //status = 1 approved ads
         //status = 2 declined ads
-        $ads = ads::where('isApprove','2')->get()->all();
-        if($ads){
+        $ads = ads::where('isApprove', '2')->get()->all();
+        if ($ads) {
             return response()->json([
                 'data' => $ads,
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'message' => "Can't find declined adds",
             ], 500);
         }
-       
     }
 
     public function approveAd(Request $request, $id)
@@ -193,7 +207,8 @@ class AddProductsController extends Controller
         }
     }
 
-    public function latestAds(){
+    public function latestAds()
+    {
         $latestAds = DB::table('ads')->orderBy('created_at', 'desc')->first();
         return response()->json([
             'data' => $latestAds,
@@ -201,8 +216,10 @@ class AddProductsController extends Controller
         ], 200);
     }
 
-    public function searchbycat(Request $request, $id){
-        $results = DB::table('ads')->where('category',$id)->get();
+    public function searchbycat(Request $request, $id)
+    {
+        // dd($request);
+        $results = DB::table('ads')->where('category', $id)->get();
         return response()->json([
             'data' => $results,
             'message' => 'Search by category ads fetched successfully!',
@@ -228,6 +245,4 @@ class AddProductsController extends Controller
             ], 500);
         }
     }
-
-    
 }

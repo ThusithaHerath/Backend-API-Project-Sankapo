@@ -31,9 +31,9 @@ Route::prefix('auth')->group(function () {
 	Route::get('account/verified/{msg}', 'App\Http\Controllers\Api\Auth\AuthController@verifiedEmail')->name('account.verified');
 });
 
-Route::prefix('profile')->group(function(){
+Route::prefix('profile')->group(function () {
 	Route::get('/mylistings/{id}', 'App\Http\Controllers\Api\Auth\AuthController@mylistings')->name('profile.mylistings');
-	Route::get('/myprofile/{id]', 'App\Http\Controllers\Api\Auth\AuthController@myprofile')->name('profile.myprofile');
+	Route::get('/myprofile/{id}', 'App\Http\Controllers\Api\Auth\AuthController@myprofile')->name('profile.myprofile');
 });
 
 Route::prefix('category')->group(function () {
@@ -90,4 +90,3 @@ Route::prefix('negotiation')->group(function () {
 	Route::post('update/{id}', 'App\Http\Controllers\Api\NegotiationController@update')->name('negotiation.update');
 	// Route::delete('delete/{id}', 'App\Http\Controllers\Api\NegotiationController@destroy')->name('negotiation.delete');
 });
-
